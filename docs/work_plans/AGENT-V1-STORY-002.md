@@ -26,12 +26,13 @@ Integrate the native Genkit Google AI plugin to call a Gemini model (targeting "
 1.  **Configure Google AI Plugin:** Ensure the `@genkit-ai/googleai` plugin is configured in `genkit.config.ts` and potentially initialized with the project ID.
 2.  **Select Model:** Define which Gemini model to use for the Storyteller (e.g., `gemini-1.5-flash-latest`). Make this configurable via `src/config/config.ts` or environment variables.
 3.  **Develop Basic Prompts:** Create initial prompt structures within the flow for different scenarios:
-    *   Processing a player's voice/text input: Include context (current scene, recent events, player character info), the player's input, and instructions to generate the GM's response/narration and potentially identify needed state changes.
-    *   Interpreting a dice roll result: Include context, the action attempted, the dice result, and instructions to narrate the outcome based on the ruleset/situation.
-    *   Generating NPC dialogue (V1: To be spoken by Narrator voice): Include NPC persona, context, and instructions for dialogue.
+    *   Processing a `voiceResult` payload (containing results from the Bot's Gemini Live API interaction): Include context (current scene, recent events, player character info), the final user transcript, and Gemini's text response from the Live API turn. Instruct the Storyteller's Gemini call to perform any necessary *secondary processing* (e.g., extract entities for game state, determine subtle consequences, log a summary for the Planner). In some cases, if the Live API interaction provided sufficient textual output for the bot, an LLM call in the Storyteller might not be needed for this payload type.
+    *   Processing a `textMessage` input: Include context, the player's text input, and instructions to generate the GM's response/narration.
+    *   Interpreting a `diceResult` input: Include context, the action attempted, the dice result, and instructions to narrate the outcome.
+    *   Generating NPC dialogue (V1: To be spoken by Narrator voice via Live API): If a separate NPC dialogue generation step is needed within the Storyteller flow (e.g., if the initial Live API turn didn't cover it), include NPC persona, context, and instructions for dialogue. The output text would then be sent back to the bot, which would use the Live API for TTS in the *next* interaction.
 4.  **Integrate `generate` Call:**
     *   Import `generate` from `@genkit-ai/core` and the specific model reference (e.g., `gemini15Flash`) from `@genkit-ai/googleai`.
-    *   Within the flow logic (e.g., inside the `switch` statement from AGENT-V1-STORY-001), construct the appropriate prompt based on the input type.
+    *   Within the flow logic (e.g., inside the `switch` statement from AGENT-V1-STORY-001), construct the appropriate prompt based on the input type and the considerations above. If an LLM call is needed for the specific payload type:
     *   Call `await generate({ model: config.storytellerModel, prompt: constructedPrompt, config: { temperature: 0.7 /* etc */ } })`.
     *   Process the response: Extract the generated text content.
 5.  **Update Flow Output:** Modify the flow's return value to potentially include the generated text, though for V1 the primary output channel is the Live Voice API managed by the Bot. The main goal here is internal processing and state update preparation.
