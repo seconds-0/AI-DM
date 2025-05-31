@@ -65,6 +65,7 @@ Set up the foundational Infrastructure as Code (IaC) using Terraform to manage c
     *   [ ] Define a `google_artifact_registry_repository` resource (e.g., format DOCKER, name `discord-bot-repo`).
 *   [ ] In `infra/main.tf` (or a dedicated `secrets.tf`):
     *   [ ] Define `google_secret_manager_secret` resources for planned secrets (e.g., `discord-bot-token`). **Do not define `google_secret_manager_secret_version` here.**
+    *   [ ] <!-- (Optional) Define placeholder for OPENAI_API_KEY if future use is anticipated: google_secret_manager_secret for OPENAI_API_KEY. Note: Not required for PRDv2 V1. -->
 *   [ ] Create `infra/outputs.tf` (e.g., output Artifact Registry repository URL).
 *   [ ] Run `terraform fmt` to format the code.
 *   [ ] Run `terraform validate` to check syntax.

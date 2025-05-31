@@ -49,7 +49,7 @@ Extend the Terraform configuration to define the core application infrastructure
     *   [ ] Define `google_project_iam_member` or `google_project_iam_binding` resources to grant roles:
         *   `storyteller-sa`: `roles/datastore.user`, `roles/logging.logWriter`, `roles/monitoring.metricWriter`, `roles/cloudtrace.agent`, `roles/secretmanager.secretAccessor`, `roles/aiplatform.user`.
         *   `planner-sa`: `roles/datastore.user`, `roles/logging.logWriter`, `roles/monitoring.metricWriter`, `roles/cloudtrace.agent`, `roles/secretmanager.secretAccessor`, `roles/aiplatform.user`, `roles/eventarc.eventReceiver`.
-        *   `discord-bot-sa`: `roles/run.invoker` (on storyteller function), `roles/iam.serviceAccountTokenCreator`, `roles/secretmanager.secretAccessor`, `roles/logging.logWriter` (plus any roles needed for Live Voice API - TBD).
+        *   `discord-bot-sa`: `roles/run.invoker` (on storyteller function), `roles/iam.serviceAccountTokenCreator` (to generate identity tokens for calling Storyteller), `roles/secretmanager.secretAccessor`, `roles/logging.logWriter` (plus specific IAM permissions required for accessing the **Gemini Live API / `generativelanguage.googleapis.com` WebSocket endpoint** - to be determined during DISCORD-V1-002 implementation).
 *   **Cloud Functions (`infra/functions.tf`):**
     *   [ ] Define `google_cloudfunctions2_function` for `storyteller-flow`:
         *   `location = var.region`

@@ -17,7 +17,7 @@ Integrate the Google Live Voice API into the Discord Bot. The bot needs to manag
 *   `src/discord/liveVoiceHandler.ts` (New module)
 *   `src/discord/bot.ts` (Event listeners for voice state, potentially commands)
 *   `discord.js` (Voice channel management, audio streams)
-*   Google Live Voice API Client (Node.js SDK or custom implementation for streaming API)
+*   Google Live Voice API Client (Node.js, likely direct WebSocket implementation for `wss://generativelanguage.googleapis.com/.../BidiGenerateContent` endpoint, or verify if `@google/generative-ai` SDK adequately supports this specific audio streaming use case)
 *   `@discordjs/voice` library (For managing Discord voice connections and streams)
 *   `src/config/config.ts` (API keys/endpoints for Live Voice API)
 *   `src/utils/logger.ts`
@@ -30,7 +30,8 @@ Integrate the Google Live Voice API into the Discord Bot. The bot needs to manag
     *   Manage the voice connection state (`VoiceConnection`).
 3.  **Audio Streaming (Discord -> Live Voice API):**
     *   Once connected, get the audio stream (`receiver.subscribe`) for a user (or potentially combined stream, TBD based on API needs).
-    *   Set up the connection to the Google Live Voice API endpoint (using its SDK/protocol).
+    *   Set up the WebSocket connection to the Gemini Live API endpoint (e.g., `wss://generativelanguage.googleapis.com/ws/.../BidiGenerateContent`). This may involve direct WebSocket client usage if the standard `@google/generative-ai` SDK does not fully support the required audio streaming and message exchange protocol for `BidiGenerateContent`.
+    *   Investigate and confirm the audio encoding format(s) (e.g., LINEAR16, Opus) accepted by the Gemini Live API for the `audio` field in `BidiGenerateContentRealtimeInput`. Implement transcoding from Discord's Opus stream if necessary.
     *   Pipe/forward the Opus audio stream from Discord (potentially needing transcoding if the API requires a different format like LINEAR16) to the Live Voice API input stream.
 4.  **Audio Streaming (Live Voice API -> Discord):**
     *   Receive the audio stream output from the Live Voice API.
@@ -93,8 +94,8 @@ Lead Engineer (self)
 
 ## Questions / Uncertainties
 
-*   **Availability & Interface of Live Voice API Node.js Client:** Does a dedicated Node.js streaming client exist? If not, implementing the bidirectional gRPC/REST streaming protocol manually adds significant complexity.
-*   **Audio Format Compatibility:** Does the Live Voice API accept Discord's Opus format directly, or is transcoding required? Transcoding adds complexity and latency.
+*   **Availability & Interface of Live Voice API Node.js Client:** Confirm if the standard `@google/generative-ai` Node.js client directly supports the stateful, bidirectional audio streaming over WebSockets required by the Gemini Live API (`BidiGenerateContent`), or if direct WebSocket client implementation is necessary. Clarify the exact message schema and lifecycle management (e.g., handling `BidiGenerateContentSetup`, `RealtimeInput`, `ServerContent` messages).
+*   **Audio Format Compatibility:** **Crucially, determine if the Gemini Live API accepts Discord's Opus format directly for the `audio` field in `BidiGenerateContentRealtimeInput`.** If not, transcoding (e.g., to LINEAR16) is required, adding complexity and latency. This needs to be confirmed during initial implementation.
 *   **API Authentication:** Exact mechanism for authenticating the streaming API call (API Key? ADC with SA?).
 *   **Interaction Turn Detection:** How reliably does the API signal the end of a user's utterance and the availability of the final transcript?
 *   **Handling Multiple Users:** Does the bot need to handle simultaneous speakers or manage separate streams per user? (Assume single active stream focus for V1 simplifies). Needs clarification based on API capabilities.
