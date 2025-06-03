@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build": "npx tsc",
-    "genkit:dev": "npx genkit start -- npx tsx --watch index.ts"
+    "genkit:dev": "npx genkit start -- npx tsx --watch index.ts",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write ."
   },
   "keywords": [],
   "author": "",
@@ -13,10 +15,21 @@
   "devDependencies": {
     "genkit-cli": "^1.0.4",
     "tsx": "^4.19.2",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0"
   },
   "dependencies": {
     "genkit": "^1.0.4",
-    "@genkit-ai/googleai": "^1.0.4"
+    "@genkit-ai/googleai": "^1.0.4",
+    "@genkit-ai/firebase": "^1.0.0",
+    "discord.js": "^14.14.1",
+    "@discordjs/voice": "^0.16.1",
+    "axios": "^1.6.8",
+    "@google-cloud/speech": "^6.3.0",
+    "@google-cloud/text-to-speech": "^5.3.0",
+    "google-auth-library": "^9.9.0"
   }
 }

@@ -15,13 +15,19 @@
  */
 
 import { gemini15Flash, googleAI } from '@genkit-ai/googleai';
-import { genkit, z } from 'genkit';
+// import { genkit, z } from 'genkit';
+import { configureGenkit, defineFlow, genkit, z } from 'genkit'; // Added defineFlow for future use
+import { firebase } from '@genkit-ai/firebase';
 
-const ai = genkit({
-  plugins: [googleAI()],
+configureGenkit({
+  plugins: [googleAI(), firebase()], // Added firebase()
+  flowStateStore: 'firebase', // Recommended for persisting flow states
+  traceStore: 'firebase', // Recommended for persisting traces
+  enableTracingAndMetrics: true, // Recommended
+  logLevel: 'debug', // Or 'info'
 });
 
-const prompt = ai.definePrompt({
+const prompt = genkit.definePrompt({
   name: 'Character Prompt',
   model: gemini15Flash,
   input: {
